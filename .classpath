@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="U:/Users/awlu/Documents/workspace/ProjectStanfordSounds/lib/CodecWav.jar"/>
+	<classpathentry kind="lib" path="U:/Users/awlu/Documents/workspace/ProjectStanfordSounds/lib/LibraryLWJGLOpenAL.jar"/>
+	<classpathentry kind="lib" path="U:/Users/awlu/Documents/workspace/ProjectStanfordSounds/lib/lwjgl.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="ProjectStanfordSounds/lib/windows"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="U:/Users/awlu/Documents/workspace/ProjectStanfordSounds/lib/slick.jar"/>
+	<classpathentry kind="lib" path="U:/Users/awlu/Documents/workspace/ProjectStanfordSounds/lib/SoundSystem.jar"/>
+	<classpathentry kind="lib" path="U:/Users/awlu/Documents/workspace/ProjectStanfordSounds/lib/CodecJOrbis.jar"/>
+	<classpathentry kind="lib" path="U:/Users/awlu/Documents/workspace/ProjectStanfordSounds/lib/JInput/jinput.jar"/>
+	<classpathentry kind="lib" path="U:/Users/awlu/Documents/workspace/ProjectStanfordSounds/lib/JInput/jinput-test.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

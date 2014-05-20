@@ -1,0 +1,37 @@
+sounds we need:
+
+Players:
+Sword Swing - DONE
+Jump - DONE
+Double Jump - DONE;
+Walk - DONE
+Laser - DONE
+Item Pickup - DONE
+Sword Clash - DONE
+Died - DONE
+Heal - DONE
+
+Knights:
+Walk - DONE
+Jump - DONE
+Axe throw
+Swing - DONE
+Clash - Same as above
+Dead - DONE
+
+PWUP Ricochet - DONE - REALLY MESSES UP AUDIO FIND NEW ONE
+
+AxeRicochet - DONE
+
+Bats:
+Dead - DONE - MAKE NEW ONE - EH
+Vengebat Spawn - DONE - GET SHORTER UNTIL FIXED
+Vengebat Reflect - DONE
+
+GameOverNoise
+
+MenuShiftNoise - DONE
+MenuSelectNoise - Tentative DEFINITELY FIND NEW ONE 
+
+BG Music - various
+	Fix bad looping

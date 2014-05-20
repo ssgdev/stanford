@@ -1,0 +1,41 @@
+<project name="ProjectStanford" default="all" basedir=".">
+	<property name="alias" value="me"/>
+	<property name="keystore.password" value="mypassword"/>
+	<property name="keystore" location="${user.home}/keyStoreLocation"/>
+	<property name="out.dir" location="${user.home}/Documents/MBHS/Software Design/Export/JWS"/>
+	
+	<!-- Make all the jars -->
+	
+	<target name="all" depends="init,game.jar,resources.jar" />
+	
+	<!-- Initialize the build process. -->
+	<target name="init">
+	    <!-- make sure the output directory exists -->
+	    <mkdir dir="${out.dir}" />
+	</target>
+		
+	<!-- Make the jar that contains only the game logic -->
+	<target name="game.jar">
+		<jar destfile="${out.dir}/game.jar">
+			<fileset dir="bin" includes="**/*.class" />
+		</jar>
+		<signjar
+		   alias="${alias}" 
+		   storepass="${keystore.password}"
+		   keystore="${keystore}" 
+		   jar="${out.dir}/game.jar"/>
+	</target>
+	
+	<!-- make the resources jar -->
+	<target name="resources.jar">
+		<jar 
+			destfile="${out.dir}/resources.jar"
+			basedir="${basedir}/resources" />
+		<signjar 
+			alias="${alias}" 
+			storepass="${keystore.password}" 
+			keystore="${keystore}" 
+			jar="${out.dir}/resources.jar" />
+	</target>
+	
+</project>
