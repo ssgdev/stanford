@@ -10,7 +10,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
+
+import net.java.games.input.Controller;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
@@ -44,7 +45,8 @@ public class GameOverState extends BasicGameState{
 	int p2finalScore;
 	int totalfinalScore;
 	
-    Image block,  player1Img, player2Img, batImg, bgImage, tempImage;
+	SpriteSheet blockSprites;
+    Image player1Img, player2Img, batImg, bgImage, tempImage;
 	Image knightImage;
 	Image axeKnightImage;
 	Image powerUpImg;
@@ -112,12 +114,18 @@ public class GameOverState extends BasicGameState{
 	boolean playApplause;
 	
 	SoundSystem mySoundSystem;
+	
+	boolean c1Exist;
     
 	public GameOverState(int i){
 		super();
 		stateID = i;
 		scores = new int[20];
 		names = new String[20];
+	}
+	
+	public void setController(Controller c1) {
+		c1Exist = (c1 != null);
 	}
 	
 	public void initScores(){
@@ -161,7 +169,7 @@ public class GameOverState extends BasicGameState{
 //		
 //        knightImage = new Image("resources/knightSheet.png");
         
-		block = ((Stanford)sbg).block;
+		blockSprites = new SpriteSheet(((Stanford)sbg).blockSprites, 20, 20);
 		bgImage = ((Stanford)sbg).bgImage;
 		player1Img = ((Stanford)sbg).player1Img;
 		player2Img = ((Stanford)sbg).player2Img;
@@ -237,18 +245,23 @@ public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws Slic
         g.drawImage(bgImage, 0, bgHeight%(2*screenHeight));
         g.drawImage(bgImage, 0, (bgHeight+screenHeight)%(2*screenHeight));
         
-        for(StaticObject statOb : statics){
-//        	g.drawRect(statOb.pos.x, statOb.pos.y, statOb.l, statOb.l);
-//        	g.drawRect(statOb.p.getX(), statOb.p.getY(), statOb.l, statOb.l);
-            g.drawImage(block, statOb.pos.x, statOb.pos.y);
-            //System.out.println(statOb.pos.x+", "+ statOb.pos.y);
-            if (statOb.coll) {
-//            	g.drawOval(statOb.p.getCenterX(), statOb.p.getCenterY(), 2, 2);
-            	statOb.coll = false;
-            }
-//            g.drawOval(statOb.p.getCenterX(), statOb.p.getCenterY(), 2, 2);
-//            g.drawOval(statOb.pos.x, statOb.pos.y, 5, 5);
-        }
+		blockSprites.startUse();
+		for (StaticObject statOb : statics) {
+			// g.drawRect(statOb.pos.x, statOb.pos.y, statOb.l, statOb.l);
+			// g.drawRect(statOb.p.getX(), statOb.p.getY(), statOb.l,
+			// statOb.l);
+			blockSprites.renderInUse((int)statOb.pos.x, (int)statOb.pos.y, statOb.getSpriteX(), statOb.getSpriteY());
+			if (statOb.coll) {
+				// g.drawOval(statOb.p.getCenterX(), statOb.p.getCenterY(),
+				// 2, 2);
+				statOb.coll = false;
+			}
+			// g.drawOval(statOb.p.getCenterX(), statOb.p.getCenterY(), 2,
+			// 2);
+			// g.drawOval(statOb.pos.x, statOb.pos.y, 5, 5);
+		}
+		blockSprites.endUse();
+
         
         for (PowerObject powerOb : powerups) {
 //			powerOb.render(g);
@@ -330,6 +343,12 @@ public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws Slic
 
         	g.drawString(str[1],260,760+15*i);
         	g.drawString(""+scores[i], 450, 760+15*i);
+        }
+        
+        if(c1Exist){
+        	g.drawString("[Press Start]", screenWidth/2-g.getFont().getWidth("[Press Start]")/2, 1110);
+        }else{
+        	g.drawString("[Press Esc]", screenWidth/2-g.getFont().getWidth("[Press Esc]")/2, 1110);
         }
         
         if(newScore > scores[scores.length-1] && nameSet == false){
@@ -614,7 +633,7 @@ public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws Slic
         		if(!tempEnemy.alive() && tempEnemy.deathFrames<=0){
         			enemies.remove(i);
         			
-        			//System.out.println("removed enemy:"+i);
+        			//S=ystem.out.println("removed enemy:"+i);
         			
         			enemSize--;
         			i--;
@@ -640,7 +659,7 @@ public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws Slic
 
     		genRowSet();
     		if(bgParity){
-    			bgHeight += 1.0*delta/24.0*1.5;
+    			bgHeight += shift*1.5;
     			bgParity=!bgParity;
     		}else{
     			bgParity=!bgParity;
@@ -820,21 +839,73 @@ public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws Slic
 		return stateID;
 	}
 
+	//Returns an int from 00 to 13
+	//The tens digit is the x index of the sprite to use in the spritesheet
+	//And the ones digit is the y index
+	//  wallL wallR wallN wallB
+	//  platL platR platN platB
+	private int getBlockSpriteIdcs(int[] newRow, int pos){
+		boolean isWall = false;
+		boolean blockedLeft = false;
+		boolean blockedRight = false;
+		if(pos == 0){
+			isWall = true;
+			blockedLeft = true;
+			if(newRow[pos+1] != 0){
+				blockedRight = true;
+			}
+		}else if(pos == world[0].length-2){//since length-1 is the count column
+			isWall = true;
+			blockedRight = true;
+			if(newRow[pos-1] != 0){
+				blockedLeft = true;
+			}
+		}else{
+			if(newRow[pos-1] != 0){
+				blockedLeft = true;
+			}
+			if(newRow[pos+1] != 0){
+				blockedRight = true;
+			}
+		}
+		
+		int ans = 0;
+		if(!isWall)
+			ans += 10;
+		
+		if(blockedLeft && !blockedRight){
+			//NO OP
+		}else if(!blockedLeft && blockedRight){
+			ans += 1;
+		}else if(!blockedLeft && !blockedRight){
+			ans += 2;
+		}else{
+			ans += 3;
+		}
+		
+		return ans;
+	}
+	
 	
     private void writeToWorld(int[] newRow, int startRow){//Write rows into world array starting at start and going up
+    	int temp = 0;
         for(int i=0;i<newRow.length;i++){
             world[startRow][i]=newRow[i];
             if(newRow[i] == 1){
-                statics.add(new StaticObject(i*blockSize/*colPos*/, startRow*blockSize, blockSize));
+            	temp = getBlockSpriteIdcs(newRow, i);
+				statics.add(new StaticObject(i*blockSize/*colPos*/, startRow*blockSize, blockSize, temp%10, temp>=10));
             }
         }        
     }
     private void writeToWorld(int[][] newRows, int start){//Write rows into world array starting at start and going up
+    	int temp = 0;
         for(int i=start;i>start-newRows.length;i--)
             for(int j=0;j<newRows[0].length;j++){
                 world[i][j]=newRows[start-i][j];
                 if(newRows[start-i][j] == 1){
-                    statics.add(new StaticObject(j*blockSize/*colPos*/, i*blockSize, blockSize));
+            		temp = getBlockSpriteIdcs(newRows[start-i], j);
+					statics.add(new StaticObject(j*blockSize/*colPos*/, i*blockSize, blockSize, temp%10, temp>=10));
+
                 }
         }
     }

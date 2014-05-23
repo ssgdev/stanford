@@ -1,4 +1,7 @@
 package org.ssg.Stanford;
+import net.java.games.input.Component;
+import net.java.games.input.Controller;
+
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -56,25 +59,78 @@ public class MainMenuState extends BasicGameState{
 						  {"Play with yourself.\n", "Fling your mighty axe!\nSmite thine foes from range!", "You can never leave Das Towerung!"}};
 	
 	SoundSystem mySoundSystem;
-	public int musicStart;
+	//public int musicStart;
 	
-	public MainMenuState(int i){
+	boolean[] cExist;
+	Component[] lStickX, lStickY, selectButton;
+	boolean up, down, left, right, select = false;
+	boolean[] upPressed, downPressed, leftPressed, rightPressed, selectPressed;
+	
+	public MainMenuState(int state){
 		super();
-		stateID = i;
+		stateID = state;
+		
+		lStickX = new Component[2];
+		lStickY = new Component[2];
+		selectButton = new Component[2];
+
+		cExist = new boolean[2];
+		upPressed = new boolean[2];
+		downPressed = new boolean[2];
+		leftPressed = new boolean[2];
+		rightPressed = new boolean[2];
+		selectPressed = new boolean[2];
+
+		for(int i=0; i<2; i++){
+			cExist[i] = false;
+			upPressed[i] = true;
+			downPressed[i] = true;
+			leftPressed[i] = true;
+			rightPressed[i] = true;
+			selectPressed[i] = true;
+		}
 	}
 
-	public void enter(GameContainer gc, StateBasedGame sbg) throws SlickException {
-		mySoundSystem.flush("MainMenuMusic");
-		mySoundSystem.backgroundMusic("MainMenuMusic", "menuSong.wav", false);
+	public void setControllers(Controller c1, Controller c2){
+		cExist[0] = (c1 != null);
+		cExist[1] = (c2 != null);
 		
+		
+		if(cExist[0]){
+			lStickX[0] = c1.getComponent(Component.Identifier.Axis.X);
+			lStickY[0] = c1.getComponent(Component.Identifier.Axis.Y);
+			selectButton[0] = c1.getComponent(Component.Identifier.Button._0);
+		}
+		if(cExist[1]){
+			lStickX[1] = c2.getComponent(Component.Identifier.Axis.X);
+			lStickY[1] = c2.getComponent(Component.Identifier.Axis.Y);
+			selectButton[1] = c2.getComponent(Component.Identifier.Button._0);
+		}
+	}
+	
+	public void enter(GameContainer gc, StateBasedGame sbg) throws SlickException {
+		mySoundSystem.backgroundMusic("MainMenuMusic", "menuSong.ogg", true);
+
 		cursorX = 550-s;
 		cursorXTarget = 550-s;
 		cursorDex = 0;
+		
+		up = false;
+		down = false;
+		left = false;
+		right = false;
+		select = false;
+		for(int i=0; i<2; i++){
+			upPressed[i] = true;
+			downPressed[i] = true;
+			leftPressed[i] = true;
+			rightPressed[i] = true;
+			selectPressed[i] = true;
+		}
 	}
 	
 	public void leave(GameContainer gc, StateBasedGame sbg) throws SlickException {
-		mySoundSystem.fadeOutIn( "MainMenuMusic", "jumpSong.wav", 1000, 1000 );
-		//mySoundSystem.queueSound("MainMenuMusic", "jumpSong.wav");
+		mySoundSystem.fadeOutIn( "MainMenuMusic", "jumpSong.ogg", 1000, 2000 );
 	}
 	
 	public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
@@ -102,7 +158,7 @@ public class MainMenuState extends BasicGameState{
 		x=0;
 		xTarget = 0;
 		
-		musicStart = 0;
+		//musicStart = 0;
 		knight = false;
 	}
 
@@ -231,12 +287,53 @@ public class MainMenuState extends BasicGameState{
 	}
 
 	public void update(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
+		
+		up = false;
+		down = false;
+		left = false;
+		right = false;
+		select = false;
+		
+		for(int i=0; i<2; i++){			
+			if(cExist[i]){
+				if(lStickY[i].getPollData() > 0.5 && !downPressed[i]){
+					downPressed[i] = true;
+					down = true;
+				}else if(lStickY[i].getPollData() < -0.5 && !upPressed[i]){
+					upPressed[i] = true;
+					up = true;
+				}else if(lStickY[i].getPollData() > -0.5 && lStickY[i].getPollData() < 0.5){
+					upPressed[i] = false;
+					downPressed[i] = false;
+				}
+				
+				if(lStickX[i].getPollData() > 0.5 && !rightPressed[i]){
+					rightPressed[i] = true;
+					right = true;
+				}else if(lStickX[i].getPollData() < -0.5 && !leftPressed[i]){
+					leftPressed[i] = true;
+					left = true;
+				}else if(lStickX[i].getPollData() > -0.5 && lStickX[i].getPollData() < 0.5){
+					leftPressed[i] = false;
+					rightPressed[i] = false;
+				}
+				
+				if(selectButton[i].getPollData()==1.0 && !selectPressed[i]){
+					select = true;
+					selectPressed[i] = true;
+				}else if(selectButton[i].getPollData() == 0.0){
+					selectPressed[i] = false;
+				}
+			}
+		}
+		
+		
 		Input input = gc.getInput();
 		
-		musicStart+=delta;
-		if(musicStart>=6000){
-			mySoundSystem.queueSound("MainMenuMusic", "menuSong.wav");
-		}
+//		musicStart+=delta;
+//		if(musicStart>=6000){
+//			mySoundSystem.queueSound("MainMenuMusic", "menuSong.ogg");
+//		}
 		
 		if(cursorX != cursorXTarget){
 			cursorX += (cursorXTarget-cursorX)/(Math.abs(cursorXTarget-cursorX))*5;
@@ -255,25 +352,25 @@ public class MainMenuState extends BasicGameState{
 		}
 		
 		//If get arrow key, move selection
-		if(input.isKeyPressed(Input.KEY_UP) && x==0){
+		if((input.isKeyPressed(Input.KEY_UP) || up) && x==0){
 			mySoundSystem.quickPlay( true, "MenuShift.wav", false, 0, 0, 0, SoundSystemConfig.ATTENUATION_NONE, 0.0f );
 			if(regSelection[cursorDex]>0){
 				regTargets[cursorDex]-=(50+s);
 				regSelection[cursorDex]--;
 			}
-		}else if(input.isKeyPressed(Input.KEY_DOWN)&& x==0){
+		}else if((input.isKeyPressed(Input.KEY_DOWN) || down) && x==0){
 			mySoundSystem.quickPlay( true, "MenuShift.wav", false, 0, 0, 0, SoundSystemConfig.ATTENUATION_NONE, 0.0f );
 			if(regSelection[cursorDex]<1){
 				regTargets[cursorDex]+=(50+s);
 				regSelection[cursorDex]++;
 			}
-		}else if(input.isKeyPressed(Input.KEY_RIGHT)&& x==0){
+		}else if((input.isKeyPressed(Input.KEY_RIGHT) || right) && x==0){
 			mySoundSystem.quickPlay( true, "MenuShift.wav", false, 0, 0, 0, SoundSystemConfig.ATTENUATION_NONE, 0.0f );
 			if(cursorDex<regCoords.length-1){
 				cursorDex++;
 				cursorXTarget+=(50+s);
 			}
-    	}else if(input.isKeyPressed(Input.KEY_LEFT)&& x==0){
+    	}else if((input.isKeyPressed(Input.KEY_LEFT) || left) && x==0){
     		mySoundSystem.quickPlay( true, "MenuShift.wav", false, 0, 0, 0, SoundSystemConfig.ATTENUATION_NONE, 0.0f );
     		if(cursorDex>0){
     			cursorDex--;
@@ -292,7 +389,7 @@ public class MainMenuState extends BasicGameState{
 			}else{
 				xTarget=0;
 			}
-		}else if(x==0&&((input.isKeyPressed(Input.KEY_ENTER)) || input.isKeyPressed(Input.KEY_SPACE))){
+		}else if(x==0&&((input.isKeyPressed(Input.KEY_ENTER)) || input.isKeyPressed(Input.KEY_SPACE)) || select){
 			mySoundSystem.quickPlay( true, "MenuSelect.wav", false, 0, 0, 0, SoundSystemConfig.ATTENUATION_NONE, 0.0f );
 			if(cursorDex!=2){
 					cursorDex = 2;

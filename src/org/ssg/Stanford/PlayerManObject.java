@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import org.newdawn.slick.Animation;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
-import org.newdawn.slick.Input;
 import org.newdawn.slick.KeyListener;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
@@ -16,10 +15,6 @@ import net.java.games.input.*;
 
 import paulscode.sound.SoundSystem;
 import paulscode.sound.SoundSystemConfig; 
-import paulscode.sound.SoundSystemException; 
-//import paulscode.sound.libraries.LibraryJavaSound; 
-import paulscode.sound.libraries.LibraryLWJGLOpenAL;
-import paulscode.sound.codecs.CodecWav;
 
 public class PlayerManObject extends PlayerObject implements KeyListener {
     //animation variables

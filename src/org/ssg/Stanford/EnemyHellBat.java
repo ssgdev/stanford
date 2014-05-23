@@ -1,7 +1,6 @@
 package org.ssg.Stanford;
 import java.util.ArrayList;
 import org.newdawn.slick.Animation;
-import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SpriteSheet;

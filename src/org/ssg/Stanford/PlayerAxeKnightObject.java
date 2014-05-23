@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import net.java.games.input.*;
 
 import org.newdawn.slick.Animation;
-import org.newdawn.slick.ControllerListener;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
@@ -17,10 +16,6 @@ import org.newdawn.slick.Color;
 
 import paulscode.sound.SoundSystem;
 import paulscode.sound.SoundSystemConfig; 
-import paulscode.sound.SoundSystemException; 
-//import paulscode.sound.libraries.LibraryJavaSound; 
-import paulscode.sound.libraries.LibraryLWJGLOpenAL;
-import paulscode.sound.codecs.CodecWav;
 
 public class PlayerAxeKnightObject extends PlayerObject implements KeyListener{
     

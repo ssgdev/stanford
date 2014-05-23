@@ -1,5 +1,4 @@
 package org.ssg.Stanford;
-import java.util.ArrayList;
 
 import net.java.games.input.*;
 
@@ -13,12 +12,7 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import paulscode.sound.SoundSystem;
-import paulscode.sound.SoundSystem;
 import paulscode.sound.SoundSystemConfig; 
-import paulscode.sound.SoundSystemException; 
-//import paulscode.sound.libraries.LibraryJavaSound; 
-import paulscode.sound.libraries.LibraryLWJGLOpenAL;
-import paulscode.sound.codecs.CodecWav;
 
 public class GameMenuState extends BasicGameState{
 

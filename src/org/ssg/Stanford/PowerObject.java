@@ -1,17 +1,12 @@
 package org.ssg.Stanford;
 import java.util.ArrayList;
 
-import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.*;
 import org.newdawn.slick.state.StateBasedGame;
 
 import paulscode.sound.SoundSystem;
 import paulscode.sound.SoundSystemConfig; 
-import paulscode.sound.SoundSystemException; 
-//import paulscode.sound.libraries.LibraryJavaSound; 
-import paulscode.sound.libraries.LibraryLWJGLOpenAL;
-import paulscode.sound.codecs.CodecWav;
 
 public class PowerObject {
 	public int index;

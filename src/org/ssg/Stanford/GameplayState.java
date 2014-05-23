@@ -16,11 +16,6 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import paulscode.sound.SoundSystem;
-import paulscode.sound.SoundSystemConfig; 
-import paulscode.sound.SoundSystemException; 
-//import paulscode.sound.libraries.LibraryJavaSound; 
-import paulscode.sound.libraries.LibraryLWJGLOpenAL;
-import paulscode.sound.codecs.CodecWav;
 
 //Have #of empty rows random - min:1 max:jump height
 //Have countdowner: one shift is --
@@ -84,7 +79,8 @@ public class GameplayState extends BasicGameState {
 
 	//images/sprites/spritesheets
 
-	Image block,  player1Img, player2Img, batImg, bgImage;
+	SpriteSheet blockSprites;
+	Image player1Img, player2Img, batImg, bgImage;
 	Image playerKnightImg, playerAxeKnightImg;
 	Image knightImage;
 	Image axeKnightImage;
@@ -125,7 +121,7 @@ public class GameplayState extends BasicGameState {
 	public int stateID = 1;
 		
 	SoundSystem mySoundSystem;
-	float musicStart;//SUPER HACKY
+	//float musicStart;//SUPER HACKY
 	
 	Controller c1, c2;
 	boolean c1Exist, c2Exist;
@@ -138,7 +134,6 @@ public class GameplayState extends BasicGameState {
 
 	@Override
 	public void enter(GameContainer gc, StateBasedGame sbg) throws SlickException{
-		mySoundSystem.queueSound("MainMenuMusic", "jumpSong.wav");
 		//black = true;
 		//init(gc, sbg);
 	}
@@ -203,7 +198,7 @@ public class GameplayState extends BasicGameState {
 //		
 //		axeSheet = new SpriteSheet(new Image("resources/axeSheet.png"), 20, 20);
 		
-		block = ((Stanford)sbg).block;
+		blockSprites = new SpriteSheet(((Stanford)sbg).blockSprites, 20, 20);
 		bgImage = ((Stanford)sbg).bgImage;
 		player1Img = ((Stanford)sbg).player1Img;
 		player2Img = ((Stanford)sbg).player2Img;
@@ -221,9 +216,9 @@ public class GameplayState extends BasicGameState {
 		tempImage = new Image(screenWidth, screenHeight);
 		
 		//test initialization information.
-		
 		int[] player1Input = {Input.KEY_UP, Input.KEY_LEFT, Input.KEY_RIGHT, Input.KEY_DOWN};
 		int[] player2Input = {Input.KEY_W, Input.KEY_A, Input.KEY_D, Input.KEY_S};
+		
 		players = new ArrayList<PlayerObject>();
 		if(knightMode){
 			if(solo){
@@ -305,11 +300,12 @@ public class GameplayState extends BasicGameState {
 				}
 				setpieces.add(setPieceBlock);
 			}
+			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		world = new int[2*screenHeight/blockSize][screenWidth/blockSize+1];//Add more height for preloading and deleting//+1th column for #1s
+		world = new int[2*screenHeight/blockSize][screenWidth/blockSize+1];//40 blocks per row and one extra column for the # of blocks in the row
 		//Generate the first screen //Have starting setpiece
 		writeToWorld(setpieces.get(0),world.length-1);
 
@@ -338,24 +334,75 @@ public class GameplayState extends BasicGameState {
 		batSpawnRateCountdown = -1;
 		bgParity = true;
 		
-		musicStart = 0;
+		//musicStart = 0;
 	}
 
+	//Returns an int from 00 to 13
+	//The tens digit is the x index of the sprite to use in the spritesheet
+	//And the ones digit is the y index
+	//  wallL wallR wallN wallB
+	//  platL platR platN platB
+	private int getBlockSpriteIdcs(int[] newRow, int pos){
+		boolean isWall = false;
+		boolean blockedLeft = false;
+		boolean blockedRight = false;
+		if(pos == 0){
+			isWall = true;
+			blockedLeft = true;
+			if(newRow[pos+1] != 0){
+				blockedRight = true;
+			}
+		}else if(pos == world[0].length-2){//since length-1 is the count column
+			isWall = true;
+			blockedRight = true;
+			if(newRow[pos-1] != 0){
+				blockedLeft = true;
+			}
+		}else{
+			if(newRow[pos-1] != 0){
+				blockedLeft = true;
+			}
+			if(newRow[pos+1] != 0){
+				blockedRight = true;
+			}
+		}
+		
+		int ans = 0;
+		if(!isWall)
+			ans += 10;
+		
+		if(blockedLeft && !blockedRight){
+			//NO OP
+		}else if(!blockedLeft && blockedRight){
+			ans += 1;
+		}else if(!blockedLeft && !blockedRight){
+			ans += 2;
+		}else{
+			ans += 3;
+		}
+		
+		return ans;
+	}
+	
 	//When giving screen coordinates to blocks, offset to be screen
 	private void writeToWorld(int[] newRow, int startRow){//Write rows into world array starting at start and going up
+		int temp = 0;
 		for(int i=0;i<newRow.length;i++){
 			world[startRow][i]=newRow[i];
 			if(newRow[i] == 1){
-				statics.add(new StaticObject(i*blockSize/*colPos*/, startRow*blockSize, blockSize));
+				temp = getBlockSpriteIdcs(newRow, i);
+				statics.add(new StaticObject(i*blockSize/*colPos*/, startRow*blockSize, blockSize, temp%10, temp>=10));
 			}
 		}        
 	}
 	private void writeToWorld(int[][] newRows, int start){//Write rows into world array starting at start and going up
+		int temp = 0;
 		for(int i=start;i>start-newRows.length;i--)
 			for(int j=0;j<newRows[0].length;j++){
 				world[i][j]=newRows[start-i][j];
 				if(newRows[start-i][j] == 1){
-					statics.add(new StaticObject(j*blockSize/*colPos*/, i*blockSize, blockSize));
+					temp = getBlockSpriteIdcs(newRows[start-i], j);
+					statics.add(new StaticObject(j*blockSize/*colPos*/, i*blockSize, blockSize, temp%10, temp>=10));
 				}
 			}
 	}
@@ -525,11 +572,12 @@ public class GameplayState extends BasicGameState {
 			g.drawImage(bgImage, 0, (bgHeight + screenHeight)
 					% (2 * screenHeight));
 
+			blockSprites.startUse();
 			for (StaticObject statOb : statics) {
 				// g.drawRect(statOb.pos.x, statOb.pos.y, statOb.l, statOb.l);
 				// g.drawRect(statOb.p.getX(), statOb.p.getY(), statOb.l,
 				// statOb.l);
-				g.drawImage(block, statOb.pos.x, statOb.pos.y);
+				blockSprites.renderInUse((int)statOb.pos.x, (int)statOb.pos.y, statOb.getSpriteX(), statOb.getSpriteY());
 				if (statOb.coll) {
 					// g.drawOval(statOb.p.getCenterX(), statOb.p.getCenterY(),
 					// 2, 2);
@@ -539,6 +587,7 @@ public class GameplayState extends BasicGameState {
 				// 2);
 				// g.drawOval(statOb.pos.x, statOb.pos.y, 5, 5);
 			}
+			blockSprites.endUse();
 
 			for (PowerObject powerOb : powerups) {
 //				powerOb.render(g);
@@ -631,10 +680,10 @@ public class GameplayState extends BasicGameState {
 
 		Input input = gc.getInput();
 
-		musicStart+=delta;
-		if(musicStart>=6000){
-			mySoundSystem.queueSound("MainMenuMusic", "jumpSong.wav");
-		}
+//		musicStart+=delta;
+//		if(musicStart>=6000){
+//			mySoundSystem.queueSound("MainMenuMusic", "jumpSong.ogg");
+//		}
 		
 		if (!gc.hasFocus()) {		
 			gc.getGraphics().copyArea(tempImage, 0, 0);
@@ -807,9 +856,9 @@ public class GameplayState extends BasicGameState {
 			double shift = 1.0*delta/24.0 * (1.0);//Make it faster as times goes on. Can handle x2, x3 lags world gen
 			if(!spawns){
 				if(bgParity){
-					shift*=3;
-				}else{
 					shift*=4;
+				}else{
+					shift*=3;
 				}
 			}
 			for(StaticObject statOb : statics){

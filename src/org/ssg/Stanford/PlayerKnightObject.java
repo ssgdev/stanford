@@ -9,19 +9,13 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.KeyListener;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.Sound;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.*;
-import org.newdawn.slick.openal.SoundStore;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.Color;
 
 import paulscode.sound.SoundSystem;
 import paulscode.sound.SoundSystemConfig; 
-import paulscode.sound.SoundSystemException; 
-//import paulscode.sound.libraries.LibraryJavaSound; 
-import paulscode.sound.libraries.LibraryLWJGLOpenAL;
-import paulscode.sound.codecs.CodecWav;
 
 public class PlayerKnightObject extends PlayerObject implements KeyListener {
     
@@ -767,6 +761,12 @@ public class PlayerKnightObject extends PlayerObject implements KeyListener {
 			charging = false;
 			powerCharging = false;
 			dirCoolDown = 0;
+		}
+		if(menuButton.getPollData() == 1.0){
+			menuPressed = true;
+		}else{
+			menuPressed = false;
+			menuCalled = false;
 		}
 	}
 

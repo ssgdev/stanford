@@ -13,7 +13,6 @@ import org.newdawn.slick.state.StateBasedGame;
 import paulscode.sound.SoundSystem;
 import paulscode.sound.SoundSystemConfig; 
 import paulscode.sound.SoundSystemException; 
-//import paulscode.sound.libraries.LibraryJavaSound; 
 import paulscode.sound.libraries.LibraryLWJGLOpenAL;
 import paulscode.sound.codecs.CodecJOrbis;
 import paulscode.sound.codecs.CodecWav;
@@ -28,7 +27,7 @@ public class Stanford extends StateBasedGame {
 	public static final int INTROSCREENSTATE = 15;
 	
 	Image menuBG;
-	Image block,  player1Img, player2Img, batImg, hellBatImg, bgImage, titleImg;
+	Image blockSprites,  player1Img, player2Img, batImg, hellBatImg, bgImage, titleImg;
 	Image regImg, pacImg, solImg, pSolImg, exiImg, knightModeImg;
 	Image knightImage, axeKnightImage;
 	Image blueKnightImage, blueAxeKnightImage;
@@ -91,7 +90,6 @@ public class Stanford extends StateBasedGame {
 		this.addState(new GameOverMenuState(GAMEOVERMENUSTATE));
 		((GameOverMenuState) this.getState(GAMEOVERMENUSTATE)).setSoundSystem(mySoundSystem);
 		((GameOverMenuState) this.getState(GAMEOVERMENUSTATE)).setImage(((GameplayState)this.getState(GAMEPLAYSTATE)).bgImage);
-
 	}
 
 	public void initStatesList(GameContainer gc) throws SlickException {
@@ -109,8 +107,11 @@ public class Stanford extends StateBasedGame {
 	    }
 		
 		((GameplayState) this.getState(GAMEPLAYSTATE)).setControllers(c1, c2);
+		((MainMenuState) this.getState(MENUSTATE)).setControllers(c1, c2);
 		((GameMenuState) this.getState(GAMEMENUSTATE)).setControllers(c1, c2);
+		((GameOverState) this.getState(GAMEOVERSTATE)).setController(c1);
 		((GameOverMenuState) this.getState(GAMEOVERMENUSTATE)).setControllers(c1, c2);
+		((IntroScreenState) this.getState(INTROSCREENSTATE)).setControllers(c1, c2);
 		
 		//
 		/**
@@ -148,7 +149,7 @@ public class Stanford extends StateBasedGame {
 	}
 	
 	public void initImages() throws SlickException {
-		block = new Image("resources/sprites/block.png");
+		blockSprites = new Image("resources/sprites/blockSprites.png");
 		bgImage = new Image("resources/sprites/bg.png");
 
 		player1Img = new Image("resources/sprites/player1Sprite.png");

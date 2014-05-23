@@ -1,5 +1,9 @@
 Todo:
 
-Controller Support in GameMenuState
-Make Sure to test with 2 Xbox controllers
-Hori Controller's start button is numbered differently
+DONE Controller Support in Menus
+DONE New Music
+DONE Figure out background music etc
+	Updated Pauls Sound System doesn't have loop bug
+	Used proper looping bgm
+DONE Bug: Knight Mode Sword can't press start on controller
+

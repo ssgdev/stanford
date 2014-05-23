@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="U:/Users/awlu/Documents/workspace/ProjectStanfordSounds/lib/CodecJOrbis.jar"/>
 	<classpathentry kind="lib" path="U:/Users/awlu/Documents/workspace/ProjectStanfordSounds/lib/JInput/jinput.jar"/>
 	<classpathentry kind="lib" path="U:/Users/awlu/Documents/workspace/ProjectStanfordSounds/lib/JInput/jinput-test.jar"/>
+	<classpathentry kind="lib" path="U:/Users/awlu/Documents/workspace/ProjectStanfordSounds/lib/LibraryJavaSound.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

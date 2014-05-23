@@ -9,11 +9,15 @@ public class StaticObject {
     public int l;
     public Polygon p;
     public boolean coll;
+    int spriteIndX, spriteIndY;
     
-    public StaticObject(int a, int b, int length){//a and b are coordinates
+    public StaticObject(int a, int b, int length, int indX, boolean isntWall){//a and b are coordinates
         pos = new Vector2f (a, b);
         l=length;
         p = new Polygon(new float[]{pos.x,pos.y,pos.x+l,pos.y,pos.x+l,pos.y+l,pos.x,pos.y+l});
+        spriteIndX = indX;
+        spriteIndY = isntWall ? 1 : 0;
+
     }    
     
     public void shiftDown(double d){
@@ -27,6 +31,14 @@ public class StaticObject {
     
     public void render(Graphics g) {
     	
+    }
+    
+    public int getSpriteX(){
+    	return spriteIndX;
+    }
+    
+    public int getSpriteY(){
+    	return spriteIndY;
     }
     
 }

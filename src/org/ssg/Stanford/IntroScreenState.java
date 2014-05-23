@@ -1,4 +1,7 @@
 package org.ssg.Stanford;
+import net.java.games.input.Component;
+import net.java.games.input.Controller;
+
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -28,11 +31,29 @@ public class IntroScreenState extends BasicGameState{
 	
 	SoundSystem mySoundSystem;
 	
+	boolean c1Exist, c2Exist;
+	Component selectButton1, selectButton2;
+	Component menuButton1, menuButton2;
+	
 	public IntroScreenState(int i){
 		super();
 		stateID = i;
 	}
 
+	public void setControllers(Controller c1, Controller c2){
+		c1Exist = (c1 != null);
+		c2Exist = (c2 != null);
+		
+		if(c1Exist){
+			selectButton1 = c1.getComponent(Component.Identifier.Button._0);
+			menuButton1 = c1.getComponent(Component.Identifier.Button._7);
+		}
+		if(c2Exist){
+			selectButton2 = c2.getComponent(Component.Identifier.Button._0);
+			menuButton2 = c2.getComponent(Component.Identifier.Button._7);
+		}
+	}
+	
 	public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
 		title =((Stanford)sbg).titleImg;
 	}
@@ -44,6 +65,12 @@ public class IntroScreenState extends BasicGameState{
 	
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
 		g.drawImage(title,0,0);
+		
+		if(c1Exist){
+			g.getFont().drawString(250, 320, "[Press Start]");
+		}else{
+			g.getFont().drawString(250, 320, "[Press Enter]");
+		}
 	}
 
 	public void update(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
@@ -52,7 +79,9 @@ public class IntroScreenState extends BasicGameState{
 		if(input.isKeyPressed(Input.KEY_ESCAPE)){
 			mySoundSystem.cleanup();
     		gc.exit();
-    	}else if(input.isKeyPressed(Input.KEY_ENTER)){
+    	}else if(input.isKeyPressed(Input.KEY_ENTER)
+    			|| (c1Exist? selectButton1.getPollData() == 1.0 || menuButton1.getPollData() == 1.0 : false)
+    			|| (c2Exist? selectButton2.getPollData() == 1.0 || menuButton2.getPollData() == 1.0 : false)){
     		sbg.enterState(MENUSTATE);
     	}else{
     		input.clearKeyPressedRecord();
